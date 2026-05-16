@@ -1,0 +1,10 @@
+{
+  "name": "communicolor-server",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch index.ts",
+    "start": "bun index.ts"
+  }
+}
