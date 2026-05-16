@@ -1,0 +1,32 @@
+# Local: http://localhost:8080  (communicolor defaults to 8081 so both stacks can run). WEB_HOST_PORT overrides.
+# Coolify: map your domain to the web service (container port 80).
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    restart: unless-stopped
+    environment:
+      PORT: "3001"
+    expose:
+      - "3001"
+    networks:
+      - internal
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        VITE_WS_URL: ${VITE_WS_URL:-}
+    restart: unless-stopped
+    ports:
+      - "${WEB_HOST_PORT:-8080}:80"
+    depends_on:
+      - server
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

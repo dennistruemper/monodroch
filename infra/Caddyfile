@@ -1,0 +1,19 @@
+# Local: map *.localhost → each app (origins isolated for localStorage / workers).
+# Browse: http://communicounter.localhost:8080 and http://communicolor.localhost:8080
+# (port is EDGE_HOST_PORT from docker compose, default 8080)
+
+:80 {
+	@counter host communicounter.localhost
+	handle @counter {
+		reverse_proxy communicounter_web:80
+	}
+
+	@color host communicolor.localhost
+	handle @color {
+		reverse_proxy communicolor_web:80
+	}
+
+	handle {
+		respond "Use Host communicounter.localhost or communicolor.localhost with EDGE_HOST_PORT (default 8080). See infra/README.md." 404
+	}
+}

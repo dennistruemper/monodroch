@@ -1,0 +1,16 @@
+# Merged automatically for local `docker compose up`; omit with `docker compose -f docker-compose.yaml ...`
+# for app-only runs. Coolify should use docker-compose.yaml only (this file is not merged when using explicit -f).
+
+services:
+  edge:
+    image: caddy:2.8-alpine
+    restart: unless-stopped
+    ports:
+      - "${EDGE_HOST_PORT:-8080}:80"
+    volumes:
+      - ./infra/Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on:
+      - communicounter_web
+      - communicolor_web
+    networks:
+      - monodroch

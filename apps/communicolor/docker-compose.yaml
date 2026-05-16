@@ -1,0 +1,32 @@
+# Local default host port is 8081 so it can run beside communicounter (8080). Override: WEB_HOST_PORT=9090 docker compose up
+# Coolify: map your domain to the web service (container port 80); published host port is usually unused.
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    restart: unless-stopped
+    environment:
+      PORT: "3001"
+    expose:
+      - "3001"
+    networks:
+      - internal
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+      args:
+        VITE_WS_URL: ${VITE_WS_URL:-}
+    restart: unless-stopped
+    ports:
+      - "${WEB_HOST_PORT:-8081}:80"
+    depends_on:
+      - server
+    networks:
+      - internal
+
+networks:
+  internal:
+    driver: bridge

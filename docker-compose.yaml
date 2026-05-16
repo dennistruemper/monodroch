@@ -1,0 +1,73 @@
+# Monorepo: all Foldkit app services (Bun WS + nginx/Vite web).
+# Local dev: `docker compose up --build` automatically merges docker-compose.override.yaml (Caddy edge).
+# URLs: http://communicounter.localhost:8080 and http://communicolor.localhost:8080 (override EDGE_HOST_PORT).
+#
+# Coolify / CI: point at this file only (no override) — app containers only; platform handles TLS and routing.
+
+services:
+  communicounter_server:
+    build:
+      context: ./apps/communicounter
+      dockerfile: Dockerfile.server
+    restart: unless-stopped
+    environment:
+      PORT: "3001"
+    expose:
+      - "3001"
+    networks:
+      communicounter_internal:
+        aliases:
+          # nginx.conf proxies to hostname "server" (per-app compose uses service name server).
+          - server
+
+  communicounter_web:
+    build:
+      context: ./apps/communicounter
+      dockerfile: Dockerfile.web
+      args:
+        VITE_WS_URL: ${VITE_WS_URL:-}
+    restart: unless-stopped
+    expose:
+      - "80"
+    depends_on:
+      - communicounter_server
+    networks:
+      - communicounter_internal
+      - monodroch
+
+  communicolor_server:
+    build:
+      context: ./apps/communicolor
+      dockerfile: Dockerfile.server
+    restart: unless-stopped
+    environment:
+      PORT: "3001"
+    expose:
+      - "3001"
+    networks:
+      communicolor_internal:
+        aliases:
+          - server
+
+  communicolor_web:
+    build:
+      context: ./apps/communicolor
+      dockerfile: Dockerfile.web
+      args:
+        VITE_WS_URL: ${VITE_WS_URL:-}
+    restart: unless-stopped
+    expose:
+      - "80"
+    depends_on:
+      - communicolor_server
+    networks:
+      - communicolor_internal
+      - monodroch
+
+networks:
+  monodroch:
+    driver: bridge
+  communicounter_internal:
+    driver: bridge
+  communicolor_internal:
+    driver: bridge
