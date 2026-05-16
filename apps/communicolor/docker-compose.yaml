@@ -1,5 +1,5 @@
-# Local default host port is 8081 so it can run beside communicounter (8080). Override: WEB_HOST_PORT=9090 docker compose up
-# Coolify: map your domain to the web service (container port 80); published host port is usually unused.
+# See docker-compose.hostports.yaml for localhost:8081 when developing this app alone.
+# Coolify: map FQDN to service `web`, container port 80.
 services:
   server:
     build:
@@ -20,8 +20,8 @@ services:
       args:
         VITE_WS_URL: ${VITE_WS_URL:-}
     restart: unless-stopped
-    ports:
-      - "${WEB_HOST_PORT:-8081}:80"
+    expose:
+      - "80"
     depends_on:
       - server
     networks:

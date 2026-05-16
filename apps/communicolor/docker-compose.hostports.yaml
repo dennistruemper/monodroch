@@ -1,0 +1,6 @@
+# Local dev: publish web on the host. Coolify does not need this (proxy hits container :80).
+#   docker compose -f docker-compose.yaml -f docker-compose.hostports.yaml up --build
+services:
+  web:
+    ports:
+      - "${WEB_HOST_PORT:-8081}:80"

@@ -1,5 +1,6 @@
-# Local: http://localhost:8080  (communicolor defaults to 8081 so both stacks can run). WEB_HOST_PORT overrides.
-# Coolify: map your domain to the web service (container port 80).
+# Container port 80 only on `web` (no host bind) so Coolify and multiple apps never fight for 8080/8081.
+# Local with host port: docker compose -f docker-compose.yaml -f docker-compose.hostports.yaml up --build
+# Coolify: map FQDN to service `web`, container port 80.
 services:
   server:
     build:
@@ -20,8 +21,8 @@ services:
       args:
         VITE_WS_URL: ${VITE_WS_URL:-}
     restart: unless-stopped
-    ports:
-      - "${WEB_HOST_PORT:-8080}:80"
+    expose:
+      - "80"
     depends_on:
       - server
     networks:
